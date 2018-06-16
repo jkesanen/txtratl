@@ -1,0 +1,10 @@
+IndentWidth: 4
+AccessModifierOffset: -4
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+BreakBeforeBinaryOperators: false
+BreakBeforeBraces: Allman
+ColumnLimit: 0
+PointerAlignment: Left
+UseTab: Never
+
