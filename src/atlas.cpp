@@ -21,7 +21,7 @@ void Atlas::blitImage(Image& canvas, ImageRect const& ir) const
     else if (ir.mImage.channels() == 4 && canvas.channels() == 3)
     {
 #if 1
-        // Convert source from ARGB to RGB format using SSE3 intrinsics
+        // Convert source from RGBA to RGB format using SSE3 intrinsics
         std::cout << "Fast blit " << ir.filename() << std::endl;
         imageblit::blitRGBAtoRGB_SSE3(canvas.ptr(ir.getY(), ir.getX(), 0),
                                       ir.mImage.ptr(0, 0, 0),
@@ -29,7 +29,7 @@ void Atlas::blitImage(Image& canvas, ImageRect const& ir) const
                                       ir.getWidth(),
                                       canvas.cols() * canvas.channels());
 #else
-        // Convert source from ARGB to RGB format
+        // Convert source from RGBA to RGB format
         for (int row = 0; row < ir.getHeight(); ++row)
         {
             unsigned char* src = ir.mImage.ptr(row, 0, 0);
@@ -92,7 +92,7 @@ bool Atlas::packImages()
 {
     std::vector<rect_xywhf*> rectPtrs;
 
-    // Push rect ppointers into a vector as rectpack2D wants then
+    // Push rect pointers into a vector for passing to rectpack2D
     for (auto& image : mImages)
     {
         rectPtrs.push_back(&image.mRect);

@@ -68,7 +68,7 @@ private:
     };
 
     /**
-    *   @brief  Blits image rects into a given canvas according to rects coordinates.
+    *   @brief  Blits image rect into a given canvas according to rect's coordinates.
     *
     *   @param  canvas is the destination for image to be blit
     *   @param  ir is the destination for image to be blit
@@ -86,7 +86,7 @@ private:
     bool blitImages(zz::Image& canvas) const;
 
     /**
-    *   @brief  Writes atlas metadata into a text file
+    *   @brief  Writes atlas metadata into a text file.
     *
     *   @param  outputFilename is the destination TXT file for atlas metadata
     *   @return true, if file was created successfully
