@@ -18,6 +18,16 @@ void Atlas::blitImage(Image& canvas, ImageRect const& ir) const
             std::memcpy(dest, src, ir.getWidth() * canvas.channels());
         }
     }
+    else if (ir.mImage.channels() == 3 && canvas.channels() == 4)
+    {
+        // Convert source from RGB to RGBA format using SSE3 intrinsics
+        std::cout << "Fast RGBA blit " << ir.filename() << std::endl;
+        imageblit::blitRGBtoRGBA_SSE3(canvas.ptr(ir.getY(), ir.getX(), 0),
+                                      ir.mImage.ptr(0, 0, 0),
+                                      ir.getHeight(),
+                                      ir.getWidth(),
+                                      canvas.cols());
+    }
     else if (ir.mImage.channels() == 4 && canvas.channels() == 3)
     {
 #if 1
@@ -27,7 +37,7 @@ void Atlas::blitImage(Image& canvas, ImageRect const& ir) const
                                       ir.mImage.ptr(0, 0, 0),
                                       ir.getHeight(),
                                       ir.getWidth(),
-                                      canvas.cols() * canvas.channels());
+                                      canvas.cols());
 #else
         // Convert source from RGBA to RGB format
         for (int row = 0; row < ir.getHeight(); ++row)
