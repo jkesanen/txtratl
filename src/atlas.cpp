@@ -69,6 +69,24 @@ bool Atlas::blitImages(Image& canvas) const
     return true;
 }
 
+static std::string getFilename(std::string path)
+{
+    std::replace(path.begin(), path.end(), '\\', '/');
+    std::string::size_type pos = path.find_last_of("/");
+
+    if (pos == std::string::npos)
+    {
+        return path;
+    }
+
+    if (pos != path.length())
+    {
+        return path.substr(pos + 1);
+    }
+
+    return std::string();
+}
+
 bool Atlas::writeMetadata(std::string const& outputFilename) const
 {
     // Always overwrite the output file
@@ -84,9 +102,9 @@ bool Atlas::writeMetadata(std::string const& outputFilename) const
     {
         // Create a tab separated row consisting of:
         //   filename, x coordinate, y coordinate, width, height
-        editor << os::path_split_filename(image.filename()) << "\t";
+        editor << getFilename(image.filename()) << "\t";
         editor << image.getX() << "\t" << image.getY() << "\t";
-        editor << image.getWidth() << "\t" << image.getHeight() << os::endl();
+        editor << image.getWidth() << "\t" << image.getHeight() << std::endl;
     }
 
     editor.flush();
@@ -153,8 +171,8 @@ bool Atlas::createAtlas(std::string const& imageFilename, std::string const& met
     if (!writeMetadata(metadataFilename))
     {
         // Writing metadata failed. Remove generated files.
-        os::remove_file(imageFilename);
-        os::remove_file(metadataFilename);
+        std::remove(imageFilename.c_str());
+        std::remove(metadataFilename.c_str());
         return false;
     }
 
