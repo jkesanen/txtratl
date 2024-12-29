@@ -1,53 +1,57 @@
-#include "atlas.hpp"
-#include "imageblit.hpp"
+#include <cstdio>
+#include <ostream>
 
-using namespace zz;
+#include "atlas.hpp"
+#include "image.hpp"
+#include "imageblit.hpp"
 
 void Atlas::blitImage(Image& canvas, ImageRect const& ir) const
 {
+    auto& source = ir.getImage();
+
     assert(canvas.rows() >= ir.getY() + ir.getHeight());
     assert(canvas.cols() >= ir.getX() + ir.getWidth());
 
-    if (ir.mImage.channels() == canvas.channels())
+    if (source.channels() == canvas.channels())
     {
         // Source and target are in the same pixel format. Copy row by row.
-        for (int row = 0; row < ir.getHeight(); ++row)
+        for (size_t row = 0; row < ir.getHeight(); ++row)
         {
-            unsigned char* const src = ir.mImage.ptr(row, 0, 0);
+            unsigned char* const src = source.ptr(row, 0U, 0U);
             unsigned char* const dest = canvas.ptr(ir.getY() + row, ir.getX(), 0);
             std::memcpy(dest, src, ir.getWidth() * canvas.channels());
         }
     }
-    else if (ir.mImage.channels() == 3 && canvas.channels() == 4)
+    else if (source.channels() == 3 && canvas.channels() == 4)
     {
         // Convert source from RGB to RGBA format using SSE3 intrinsics
         std::cout << "Fast RGBA blit " << ir.filename() << std::endl;
         imageblit::blitRGBtoRGBA_SSE3(canvas.ptr(ir.getY(), ir.getX(), 0),
-                                      ir.mImage.ptr(0, 0, 0),
+                                      source.ptr(0, 0, 0),
                                       ir.getHeight(),
                                       ir.getWidth(),
                                       canvas.cols());
     }
-    else if (ir.mImage.channels() == 4 && canvas.channels() == 3)
+    else if (source.channels() == 4 && canvas.channels() == 3)
     {
 #if 1
         // Convert source from RGBA to RGB format using SSE3 intrinsics
         std::cout << "Fast blit " << ir.filename() << std::endl;
         imageblit::blitRGBAtoRGB_SSE3(canvas.ptr(ir.getY(), ir.getX(), 0),
-                                      ir.mImage.ptr(0, 0, 0),
+                                      source.ptr(0, 0, 0),
                                       ir.getHeight(),
                                       ir.getWidth(),
                                       canvas.cols());
 #else
         // Convert source from RGBA to RGB format
-        for (int row = 0; row < ir.getHeight(); ++row)
+        for (size_t row = 0; row < ir.getHeight(); ++row)
         {
-            unsigned char* src = ir.mImage.ptr(row, 0, 0);
+            unsigned char* src = source.ptr(row, 0, 0);
             unsigned char* dest = canvas.ptr(ir.getY() + row, ir.getX(), 0);
 
-            for (int col = 0; col < ir.getWidth(); ++col)
+            for (size_t col = 0; col < ir.getWidth(); ++col)
             {
-                std::memcpy(dest, src + col * ir.mImage.channels(), canvas.channels());
+                std::memcpy(dest, src + col * source.channels(), canvas.channels());
                 dest += canvas.channels();
             }
         }
@@ -93,28 +97,27 @@ bool Atlas::writeMetadata(std::string const& outputFilename) const
 
 bool Atlas::addImage(std::string const& filename)
 {
-    ImageRect img(filename.c_str());
-    mImages.push_back(std::move(img));
+    mImages.emplace_back(ImageRect(filename.c_str()));
     return true;
 }
 
 bool Atlas::packImages()
 {
-    std::vector<rect_xywhf*> rectPtrs;
+    std::vector<rect_xywhf*> rects;
 
     // Push rect pointers into a vector for passing to rectpack2D
-    for (auto& image : mImages)
+    for (const auto& image : mImages)
     {
-        rectPtrs.push_back(&image.mRect);
+        rects.push_back(const_cast<rect_xywhf*>(&image.getRect()));
     }
 
-    if (!rectPtrs.size())
+    if (!rects.size())
     {
         return false;
     }
 
     std::vector<bin> bins;
-    pack(rectPtrs.data(), static_cast<int>(rectPtrs.size()), ATLAS_MAX_SIDE, false, bins);
+    pack(rects.data(), static_cast<int>(rects.size()), ATLAS_MAX_SIDE, false, bins);
 
     /* TODO: Packing algorithm supports creating several atlases out of a set
      * of images if they don't fit into a single atlas, but blitting the images
@@ -125,7 +128,7 @@ bool Atlas::packImages()
     }
 
     // Update the size of the target atlas
-    mAtlasSize = {bins[0].size.w, bins[0].size.h};
+    mAtlasSize = {static_cast<size_t>(bins[0].size.w), static_cast<size_t>(bins[0].size.h)};
 
     return true;
 }

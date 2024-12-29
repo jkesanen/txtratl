@@ -3,6 +3,7 @@
 #include "vendor/rectpack2d/src/pack.h"
 #include "vendor/zupply/zupply.hpp"
 
+#include "image.hpp"
 #include "imagerect.hpp"
 
 class Atlas
@@ -40,7 +41,7 @@ private:
     */
     struct AtlasSize
     {
-        static constexpr int INVALID_ATLAS = -1;
+        static constexpr size_t INVALID_ATLAS = 0;
 
         AtlasSize()
             : mWidth(INVALID_ATLAS),
@@ -48,7 +49,7 @@ private:
         {
         }
 
-        AtlasSize(int width, int height)
+        AtlasSize(size_t width, size_t height)
             : mWidth(width),
               mHeight(height)
         {
@@ -56,15 +57,22 @@ private:
 
         bool isValid()
         {
-            return (mWidth != INVALID_ATLAS);
+            return (mWidth != INVALID_ATLAS || mHeight != INVALID_ATLAS);
         }
 
-        int getWidth() const { return mWidth; }
-        int getHeight() const { return mHeight; }
+        size_t getWidth() const
+        {
+            return mWidth;
+        }
+
+        size_t getHeight() const
+        {
+            return mHeight;
+        }
 
     private:
-        int mWidth;
-        int mHeight;
+        size_t mWidth;
+        size_t mHeight;
     };
 
     /**
@@ -74,7 +82,7 @@ private:
     *   @param  ir is the destination for image to be blit
     *   @return true, if file was created successfully
     */
-    void blitImage(zz::Image& canvas, ImageRect const& ir) const;
+    void blitImage(Image& canvas, ImageRect const& ir) const;
 
     /**
     *   @brief  Blits image rects into a given canvas according to rects coordinates.
@@ -83,7 +91,7 @@ private:
     *   @param  ir is the destination for image to be blit
     *   @return true, if file was created successfully
     */
-    bool blitImages(zz::Image& canvas) const;
+    bool blitImages(Image& canvas) const;
 
     /**
     *   @brief  Writes atlas metadata into a text file.

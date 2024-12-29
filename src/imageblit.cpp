@@ -75,7 +75,7 @@ void blitRGBtoRGBA_SSE3(uint8_t* const dest, const uint8_t* src, const size_t ro
         {
             uint32_t* d = reinterpret_cast<uint32_t*>(destRow);
             // Little endian, but doesn't matter as this function is for SSE3 :)
-            *d = (0xff << 24) | (*(src + 2) << 16) | (*(src + 1) << 8) | *(src);
+            *d = static_cast<uint32_t>((0xff << 24) | (*(src + 2) << 16) | (*(src + 1) << 8) | *(src));
         }
     }
 }
