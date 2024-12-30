@@ -36,44 +36,7 @@ public:
     bool createAtlas(std::string const& imageFilename, std::string const& metadataFilename);
 
 private:
-    /**
-    *  @brief Class that holds the size of the target atlas.
-    */
-    struct AtlasSize
-    {
-        static constexpr size_t INVALID_ATLAS = 0;
-
-        AtlasSize()
-            : mWidth(INVALID_ATLAS),
-              mHeight(INVALID_ATLAS)
-        {
-        }
-
-        AtlasSize(size_t width, size_t height)
-            : mWidth(width),
-              mHeight(height)
-        {
-        }
-
-        bool isValid()
-        {
-            return (mWidth != INVALID_ATLAS || mHeight != INVALID_ATLAS);
-        }
-
-        size_t getWidth() const
-        {
-            return mWidth;
-        }
-
-        size_t getHeight() const
-        {
-            return mHeight;
-        }
-
-    private:
-        size_t mWidth;
-        size_t mHeight;
-    };
+    static constexpr size_t INVALID_ATLAS = 0;
 
     /**
     *   @brief  Blits image rect into a given canvas according to rect's coordinates.
@@ -101,6 +64,23 @@ private:
     */
     bool writeMetadata(std::string const& outputFilename) const;
 
+    bool isValid()
+    {
+        return (mWidth != INVALID_ATLAS || mHeight != INVALID_ATLAS);
+    }
+
+    size_t getWidth() const
+    {
+        return mWidth;
+    }
+
+    size_t getHeight() const
+    {
+        return mHeight;
+    }
+
     std::vector<ImageRect> mImages; ///< A store for image data
-    AtlasSize mAtlasSize;           ///< The dimensions of the atlas
+
+    size_t mWidth = INVALID_ATLAS;
+    size_t mHeight = INVALID_ATLAS;
 };

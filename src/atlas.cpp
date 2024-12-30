@@ -146,17 +146,18 @@ bool Atlas::packImages()
     }
 
     // Update the size of the target atlas
-    mAtlasSize = {static_cast<size_t>(bins[0].size.w), static_cast<size_t>(bins[0].size.h)};
+    mWidth = static_cast<size_t>(bins[0].size.w);
+    mHeight = static_cast<size_t>(bins[0].size.h);
 
     return true;
 }
 
 bool Atlas::createAtlas(std::string const& imageFilename, std::string const& metadataFilename)
 {
-    assert(mAtlasSize.isValid());
+    assert(isValid());
 
     // Create an empty image for atlas
-    Image canvas(mAtlasSize.getHeight(), mAtlasSize.getWidth(), 3);
+    Image canvas(mHeight, mWidth, 3);
 
     // Blit images into atlas image according to rect coordinates decided by packing
     if (!blitImages(canvas))
