@@ -2,6 +2,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
 
 project(txtratl)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 include(vendor/rectpack2d/CMakeLists.txt)
 include(vendor/stb/CMakeLists.txt)
 
@@ -18,12 +22,9 @@ list(APPEND SOURCES
 add_executable(txtratl
     ${SOURCES})
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 IF (MSVC)
     #target_compile_options(txtratl PRIVATE /W4 /Wall /WX)
-    target_compile_options(txtratl PRIVATE /W4 /Wall)
+    target_compile_options(txtratl PRIVATE /Zc:__cplusplus /W4 /Wall)
     add_definitions(-D_ENABLE_ATOMIC_ALIGNMENT_FIX)
 ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
     find_package(Threads REQUIRED)
