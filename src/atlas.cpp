@@ -1,47 +1,53 @@
+#include <algorithm>
 #include <cstdio>
+#include <fstream>
+#include <iostream>
 #include <ostream>
+#include <stdexcept>
 
 #include "atlas.hpp"
 #include "image.hpp"
 #include "imageblit.hpp"
 
-void Atlas::blitImage(Image& canvas, ImageRect const& ir) const
+void Atlas::blitImage(Image& canvas, const ImageRect& ir) const
 {
-    auto& source = ir.getImage();
+    auto& source = ir.image();
 
-    assert(canvas.rows() >= ir.getY() + ir.getHeight());
-    assert(canvas.cols() >= ir.getX() + ir.getWidth());
+    if (!source.data(0, 0, 0))
+    {
+        const_cast<Image&>(source).load();
+    }
 
     if (source.channels() == canvas.channels())
     {
         // Source and target are in the same pixel format. Copy row by row.
-        for (size_t row = 0; row < ir.getHeight(); ++row)
+        for (size_t row = 0; row < ir.height(); ++row)
         {
-            unsigned char* const src = source.ptr(row, 0U, 0U);
-            unsigned char* const dest = canvas.ptr(ir.getY() + row, ir.getX(), 0);
-            std::memcpy(dest, src, ir.getWidth() * canvas.channels());
+            auto src = source.data(row, 0U, 0U);
+            auto dest = canvas.data(ir.y() + row, ir.x(), 0U);
+            std::memcpy(dest, src, ir.width() * canvas.channels());
         }
     }
     else if (source.channels() == 3 && canvas.channels() == 4)
     {
         // Convert source from RGB to RGBA format using SSE3 intrinsics
-        std::cout << "Fast RGBA blit " << ir.filename() << std::endl;
-        imageblit::blitRGBtoRGBA_SSE3(canvas.ptr(ir.getY(), ir.getX(), 0),
-                                      source.ptr(0, 0, 0),
-                                      ir.getHeight(),
-                                      ir.getWidth(),
-                                      canvas.cols());
+        std::cout << "Fast RGBA blit " << ir.filepath() << std::endl;
+        imageblit::blitRGBtoRGBA_SSE3(canvas.data(ir.y(), ir.x(), 0),
+                                      source.data(0, 0, 0),
+                                      ir.height(),
+                                      ir.width(),
+                                      canvas.width());
     }
     else if (source.channels() == 4 && canvas.channels() == 3)
     {
 #if 1
         // Convert source from RGBA to RGB format using SSE3 intrinsics
-        std::cout << "Fast blit " << ir.filename() << std::endl;
-        imageblit::blitRGBAtoRGB_SSE3(canvas.ptr(ir.getY(), ir.getX(), 0),
-                                      source.ptr(0, 0, 0),
-                                      ir.getHeight(),
-                                      ir.getWidth(),
-                                      canvas.cols());
+        std::cout << "Fast blit " << ir.filepath() << std::endl;
+        imageblit::blitRGBAtoRGB_SSE3(canvas.data(ir.y(), ir.x(), 0),
+                                      source.data(0, 0, 0),
+                                      ir.height(),
+                                      ir.width(),
+                                      canvas.width());
 #else
         // Convert source from RGBA to RGB format
         for (size_t row = 0; row < ir.getHeight(); ++row)
@@ -61,7 +67,7 @@ void Atlas::blitImage(Image& canvas, ImageRect const& ir) const
 
 bool Atlas::blitImages(Image& canvas) const
 {
-    for (auto const& image : mImages)
+    for (auto& image : mImages)
     {
         blitImage(canvas, image);
     }
@@ -69,29 +75,11 @@ bool Atlas::blitImages(Image& canvas) const
     return true;
 }
 
-static std::string getFilename(std::string path)
-{
-    std::replace(path.begin(), path.end(), '\\', '/');
-    std::string::size_type pos = path.find_last_of("/");
-
-    if (pos == std::string::npos)
-    {
-        return path;
-    }
-
-    if (pos != path.length())
-    {
-        return path.substr(pos + 1);
-    }
-
-    return std::string();
-}
-
-bool Atlas::writeMetadata(std::string const& outputFilename) const
+bool Atlas::writeMetadata(const std::filesystem::path& outputFilepath) const
 {
     // Always overwrite the output file
-    std::ofstream editor;
-    editor.open(outputFilename);
+    auto editor = std::ofstream{};
+    editor.open(outputFilepath);
 
     if (!editor.good())
     {
@@ -102,9 +90,9 @@ bool Atlas::writeMetadata(std::string const& outputFilename) const
     {
         // Create a tab separated row consisting of:
         //   filename, x coordinate, y coordinate, width, height
-        editor << getFilename(image.filename()) << "\t";
-        editor << image.getX() << "\t" << image.getY() << "\t";
-        editor << image.getWidth() << "\t" << image.getHeight() << std::endl;
+        editor << image.filepath().string() << "\t";
+        editor << image.x() << "\t" << image.y() << "\t";
+        editor << image.width() << "\t" << image.height() << std::endl;
     }
 
     editor.flush();
@@ -113,7 +101,7 @@ bool Atlas::writeMetadata(std::string const& outputFilename) const
     return true;
 }
 
-bool Atlas::addImage(std::string const& filename)
+bool Atlas::addImage(const std::filesystem::path& filename)
 {
     mImages.emplace_back(ImageRect(filename.c_str()));
     return true;
@@ -121,12 +109,12 @@ bool Atlas::addImage(std::string const& filename)
 
 bool Atlas::packImages()
 {
-    std::vector<rect_xywhf*> rects;
+    auto rects = std::vector<rect_xywhf*>{};
 
     // Push rect pointers into a vector for passing to rectpack2D
     for (const auto& image : mImages)
     {
-        rects.push_back(const_cast<rect_xywhf*>(&image.getRect()));
+        rects.push_back(const_cast<rect_xywhf*>(&image.rect()));
     }
 
     if (!rects.size())
@@ -134,7 +122,7 @@ bool Atlas::packImages()
         return false;
     }
 
-    std::vector<bin> bins;
+    auto bins = std::vector<bin>{};
     pack(rects.data(), static_cast<int>(rects.size()), ATLAS_MAX_SIDE, false, bins);
 
     /* TODO: Packing algorithm supports creating several atlases out of a set
@@ -154,10 +142,8 @@ bool Atlas::packImages()
 
 bool Atlas::createAtlas(std::string const& imageFilename, std::string const& metadataFilename)
 {
-    assert(isValid());
-
     // Create an empty image for atlas
-    Image canvas(mHeight, mWidth, 3);
+    auto canvas = Image(mHeight, mWidth, 4);
 
     // Blit images into atlas image according to rect coordinates decided by packing
     if (!blitImages(canvas))
@@ -177,7 +163,7 @@ bool Atlas::createAtlas(std::string const& imageFilename, std::string const& met
         return false;
     }
 
-    std::cout << "Texture atlas and atlas metadata successfully written into " << imageFilename << " and " << metadataFilename << std::endl;
+    std::cout << "The texture atlas and atlas metadata successfully written into " << imageFilename << " and " << metadataFilename << std::endl;
 
     return true;
 }

@@ -1,14 +1,15 @@
 #pragma once
 
+#include <string>
+
 #include "vendor/rectpack2d/src/pack.h"
-#include "vendor/zupply/zupply.hpp"
 
 #include "image.hpp"
 #include "imagerect.hpp"
 
 class Atlas
 {
-    static constexpr int ATLAS_MAX_SIDE = 4096; ///< Maximum side for atlas image in pixels
+    static constexpr size_t ATLAS_MAX_SIDE = 24000; ///< Maximum side for atlas image in pixels
 
 public:
     /**
@@ -17,7 +18,7 @@ public:
     *   @param  filename is a JPEG or PNG file to be added to the atlas
     *   @return true, if image added successfully
     */
-    bool addImage(std::string const& filename);
+    bool addImage(const std::filesystem::path& filename);
 
     /**
     *   @brief  Packs the added images into the atlas.
@@ -45,7 +46,7 @@ private:
     *   @param  ir is the destination for image to be blit
     *   @return true, if file was created successfully
     */
-    void blitImage(Image& canvas, ImageRect const& ir) const;
+    void blitImage(Image& canvas, const ImageRect& ir) const;
 
     /**
     *   @brief  Blits image rects into a given canvas according to rects coordinates.
@@ -62,21 +63,11 @@ private:
     *   @param  outputFilename is the destination TXT file for atlas metadata
     *   @return true, if file was created successfully
     */
-    bool writeMetadata(std::string const& outputFilename) const;
+    bool writeMetadata(const std::filesystem::path& outputFilepath) const;
 
     bool isValid()
     {
         return (mWidth != INVALID_ATLAS || mHeight != INVALID_ATLAS);
-    }
-
-    size_t getWidth() const
-    {
-        return mWidth;
-    }
-
-    size_t getHeight() const
-    {
-        return mHeight;
     }
 
     std::vector<ImageRect> mImages; ///< A store for image data

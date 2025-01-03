@@ -11,7 +11,7 @@
 namespace imageblit
 {
 
-void blitRGBAtoRGB_SSE3(uint8_t* const dest, const uint8_t* src, const size_t rows, const size_t cols, const size_t destCols)
+void blitRGBAtoRGB_SSE3(uint8_t* dest, const uint8_t* src, const size_t rows, const size_t cols, const size_t destCols)
 {
     // A mask for skipping the every fourth byte out of 16 bytes.
     const int8_t maskBytes[16] = {0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, -1, -1, -1, -1};
@@ -44,7 +44,7 @@ void blitRGBAtoRGB_SSE3(uint8_t* const dest, const uint8_t* src, const size_t ro
     }
 }
 
-void blitRGBtoRGBA_SSE3(uint8_t* const dest, const uint8_t* src, const size_t rows, const size_t cols, const size_t destCols)
+void blitRGBtoRGBA_SSE3(uint8_t* dest, const uint8_t* src, const size_t rows, const size_t cols, const size_t destCols)
 {
     // Mask for shuffling 24-bit RGB bytes into 32-bit RGBA sets.
     const int8_t maskBytes[16] = {0, 1, 2, -1, 3, 4, 5, -1, 6, 7, 8, -1, 9, 10, 11, -1};
