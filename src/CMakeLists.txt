@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
+cmake_minimum_required(VERSION 3.12)
 
 project(txtratl)
 
@@ -28,14 +28,14 @@ endif()
 add_executable(txtratl
     ${SOURCES})
 
-IF (MSVC)
+if(MSVC)
     target_compile_options(txtratl PRIVATE /Zc:__cplusplus /W4 /Wall /wd4710 /wd4711)
-ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
+elseif(CMAKE_COMPILER_IS_GNUCXX)
     find_package(Threads REQUIRED)
     target_compile_options(txtratl PRIVATE -Wall -Wextra -mssse3 -pthread)
     target_link_libraries(txtratl PRIVATE Threads::Threads)
-ELSE()
+else()
     target_compile_options(txtratl PRIVATE -Wall -Wextra -Werror)
-ENDIF()
+endif()
 
 target_link_libraries(txtratl PRIVATE rectpack2d)
