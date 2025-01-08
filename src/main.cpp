@@ -1,7 +1,6 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "atlas.hpp"
@@ -10,7 +9,7 @@ namespace fs = std::filesystem;
 
 std::vector<fs::path> getDirectoryFiles(fs::path directory, const std::vector<std::string> extensions)
 {
-    std::vector<fs::path> files;
+    auto files = std::vector<fs::path>{};
 
     if (!fs::exists(directory) || !fs::is_directory(directory))
     {
@@ -19,7 +18,6 @@ std::vector<fs::path> getDirectoryFiles(fs::path directory, const std::vector<st
 
     for (const auto& entry : fs::directory_iterator(directory))
     {
-        std::cout << "image?: " << entry.path() << "" << entry.path().extension() << std::endl;
         if (fs::is_regular_file(entry.status()))
         {
             for (const auto& extension : extensions)
@@ -44,7 +42,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    const std::vector<std::string> extensions{".jpg", ".png"};
+    const auto extensions = std::vector<std::string>{".jpg", ".png"};
     auto imageFiles = getDirectoryFiles(argv[1], extensions);
 
     if (!imageFiles.size())
@@ -57,7 +55,7 @@ int main(int argc, char** argv)
 
     for (const auto& file : imageFiles)
     {
-        std::cout << "Adding image: " << file.relative_path() << std::endl;
+        std::cout << "Adding image: " << file.relative_path().string() << std::endl;
         if (!a.addImage(file.relative_path()))
         {
             std::cerr << "Failed to add image: " << file.relative_path() << std::endl;

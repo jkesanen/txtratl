@@ -2,15 +2,15 @@
 #include <stdexcept>
 #include <string>
 
+#include "image.hpp"
 #include "vendor/stb/stb_image.h"
 #include "vendor/stb/stb_image_write.h"
-#include "image.hpp"
 
 Image::Image(const std::filesystem::path& filepath, bool deferLoading)
 {
     if (deferLoading)
     {
-        info(filepath);
+        loadinfo(filepath);
     }
     else
     {
@@ -20,15 +20,10 @@ Image::Image(const std::filesystem::path& filepath, bool deferLoading)
 
 Image::Image(size_t width, size_t height, size_t channels)
 {
-    create(width, height, channels);
+    allocate(width, height, channels);
 }
 
-Image::~Image()
-{
-    release();
-}
-
-void Image::create(size_t width, size_t height, size_t channels)
+void Image::allocate(size_t width, size_t height, size_t channels)
 {
     mWidth = width;
     mHeight = height;
@@ -36,12 +31,13 @@ void Image::create(size_t width, size_t height, size_t channels)
     mData = std::make_shared<std::vector<uint8_t>>(mWidth * mHeight * mChannels);
 }
 
-void Image::info(const std::filesystem::path& filepath)
+void Image::loadinfo(const std::filesystem::path& filepath)
 {
-    int width;
-    int height;
-    int channels;
-    int result = stbi_info(filepath.string().c_str(), &width, &height, &channels);
+    auto width = 0;
+    auto height = 0;
+    auto channels = 0;
+
+    auto result = stbi_info(filepath.string().c_str(), &width, &height, &channels);
 
     if (result)
     {
@@ -50,17 +46,18 @@ void Image::info(const std::filesystem::path& filepath)
         throw std::runtime_error(msg);
     }
 
-    mWidth = width;
-    mHeight = height;
-    mChannels = channels;
+    mWidth = static_cast<size_t>(width);
+    mHeight = static_cast<size_t>(height);
+    mChannels = static_cast<size_t>(channels);
     mFilePath = filepath;
 }
 
 void Image::load(const std::filesystem::path& filepath)
 {
-    int width;
-    int height;
-    int channels;
+    auto width = 0;
+    auto height = 0;
+    auto channels = 0;
+
     uint8_t* buffer = stbi_load(filepath.string().c_str(), &width, &height, &channels, 0);
 
     if (!buffer)
@@ -70,7 +67,7 @@ void Image::load(const std::filesystem::path& filepath)
         throw std::runtime_error(msg);
     };
 
-    create(static_cast<size_t>(width), static_cast<size_t>(height), static_cast<size_t>(channels));
+    allocate(static_cast<size_t>(width), static_cast<size_t>(height), static_cast<size_t>(channels));
     mFilePath = filepath;
 
     std::memcpy((*mData).data(), buffer, sizeof(uint8_t) * mWidth * mHeight * mChannels);
@@ -98,26 +95,25 @@ size_t Image::channels() const
     return mChannels;
 }
 
-size_t Image::width() const
-{
-    return mWidth;
-}
-
 size_t Image::height() const
 {
     return mHeight;
 }
 
-void Image::save(const std::filesystem::path& filepath, size_t quality) const
+size_t Image::width() const
 {
-    assert(quality <= 100);
+    return mWidth;
+}
+
+void Image::save(const std::filesystem::path& filepath) const
+{
     stbi_write_png(filepath.string().c_str(), mWidth, mHeight, mChannels, (*mData).data(), mWidth * mChannels);
 }
 
 void Image::release()
 {
+    mData = nullptr;
     mChannels = 0;
     mHeight = 0;
     mWidth = 0;
-    mData = nullptr;
 }

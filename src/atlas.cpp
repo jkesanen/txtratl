@@ -9,10 +9,13 @@
 #include "image.hpp"
 #include "imageblit.hpp"
 
-void Atlas::blitImage(Image& canvas, const ImageRect& ir) const
+#include "vendor/rectpack2d/src/pack.h"
+
+void Atlas::blitImageRect(Image& canvas, const ImageRect& ir) const
 {
     auto& source = ir.image();
 
+    // If the image data has not been loaded, do it now.
     if (!source.data(0, 0, 0))
     {
         const_cast<Image&>(source).load();
@@ -20,7 +23,7 @@ void Atlas::blitImage(Image& canvas, const ImageRect& ir) const
 
     if (source.channels() == canvas.channels())
     {
-        // Source and target are in the same pixel format. Copy row by row.
+        // Source and target are in the same pixel format, copy row by row.
         for (size_t row = 0; row < ir.height(); ++row)
         {
             auto src = source.data(row, 0U, 0U);
@@ -30,7 +33,7 @@ void Atlas::blitImage(Image& canvas, const ImageRect& ir) const
     }
     else if (source.channels() == 3 && canvas.channels() == 4)
     {
-        // Convert source from RGB to RGBA format using SSE3 intrinsics
+        // Convert source from RGB to RGBA format.
         std::cout << "Fast RGBA blit " << ir.filepath() << std::endl;
         imageblit::blitRGBtoRGBA_SSE3(canvas.data(ir.y(), ir.x(), 0),
                                       source.data(0, 0, 0),
@@ -41,7 +44,7 @@ void Atlas::blitImage(Image& canvas, const ImageRect& ir) const
     else if (source.channels() == 4 && canvas.channels() == 3)
     {
 #if 1
-        // Convert source from RGBA to RGB format using SSE3 intrinsics
+        // Convert source from RGBA to RGB format.
         std::cout << "Fast blit " << ir.filepath() << std::endl;
         imageblit::blitRGBAtoRGB_SSE3(canvas.data(ir.y(), ir.x(), 0),
                                       source.data(0, 0, 0),
@@ -67,9 +70,9 @@ void Atlas::blitImage(Image& canvas, const ImageRect& ir) const
 
 bool Atlas::blitImages(Image& canvas) const
 {
-    for (auto& image : mImages)
+    for (auto& imagerect : mImages)
     {
-        blitImage(canvas, image);
+        blitImageRect(canvas, imagerect);
     }
 
     return true;
@@ -77,7 +80,7 @@ bool Atlas::blitImages(Image& canvas) const
 
 bool Atlas::writeMetadata(const std::filesystem::path& outputFilepath) const
 {
-    // Always overwrite the output file
+    // Always overwrite the output file.
     auto editor = std::ofstream{};
     editor.open(outputFilepath);
 
@@ -90,7 +93,7 @@ bool Atlas::writeMetadata(const std::filesystem::path& outputFilepath) const
     {
         // Create a tab separated row consisting of:
         //   filename, x coordinate, y coordinate, width, height
-        editor << image.filepath().string() << "\t";
+        editor << image.filepath().filename().string() << "\t";
         editor << image.x() << "\t" << image.y() << "\t";
         editor << image.width() << "\t" << image.height() << std::endl;
     }
@@ -140,7 +143,7 @@ bool Atlas::packImages()
     return true;
 }
 
-bool Atlas::createAtlas(std::string const& imageFilename, std::string const& metadataFilename)
+bool Atlas::createAtlas(const std::filesystem::path& imageFilepath, const std::filesystem::path& metadataFilepath)
 {
     // Create an empty image for atlas
     auto canvas = Image(mHeight, mWidth, 4);
@@ -152,18 +155,18 @@ bool Atlas::createAtlas(std::string const& imageFilename, std::string const& met
     }
 
     // Write the atlas image into the destionation file
-    canvas.save(imageFilename.c_str(), 99);
+    canvas.save(imageFilepath);
     canvas.release();
 
-    if (!writeMetadata(metadataFilename))
+    if (!writeMetadata(metadataFilepath))
     {
         // Writing metadata failed. Remove generated files.
-        std::remove(imageFilename.c_str());
-        std::remove(metadataFilename.c_str());
+        std::filesystem::remove(imageFilepath);
+        std::filesystem::remove(metadataFilepath);
         return false;
     }
 
-    std::cout << "The texture atlas and atlas metadata successfully written into " << imageFilename << " and " << metadataFilename << std::endl;
+    std::cout << "The texture atlas and atlas metadata successfully written into " << imageFilepath.string() << " and " << metadataFilepath.string() << std::endl;
 
     return true;
 }

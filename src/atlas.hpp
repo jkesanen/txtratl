@@ -1,8 +1,6 @@
 #pragma once
 
-#include <string>
-
-#include "vendor/rectpack2d/src/pack.h"
+#include <filesystem>
 
 #include "image.hpp"
 #include "imagerect.hpp"
@@ -34,7 +32,7 @@ public:
     *   @param  metadataFilename is the destination TXT file for atlas metadata
     *   @return true, if files were created successfully
     */
-    bool createAtlas(std::string const& imageFilename, std::string const& metadataFilename);
+    bool createAtlas(const std::filesystem::path& imageFilepath, const std::filesystem::path& metadataFilepath);
 
 private:
     static constexpr size_t INVALID_ATLAS = 0;
@@ -46,7 +44,7 @@ private:
     *   @param  ir is the destination for image to be blit
     *   @return true, if file was created successfully
     */
-    void blitImage(Image& canvas, const ImageRect& ir) const;
+    void blitImageRect(Image& canvas, const ImageRect& ir) const;
 
     /**
     *   @brief  Blits image rects into a given canvas according to rects coordinates.
@@ -65,7 +63,7 @@ private:
     */
     bool writeMetadata(const std::filesystem::path& outputFilepath) const;
 
-    bool isValid()
+    bool isValid() const
     {
         return (mWidth != INVALID_ATLAS || mHeight != INVALID_ATLAS);
     }
