@@ -1,7 +1,38 @@
-#include "atlas.hpp"
-#include "zupply.hpp"
+#include <filesystem>
+#include <iostream>
+#include <string>
+#include <vector>
 
-using namespace zz;
+#include "atlas.hpp"
+
+namespace fs = std::filesystem;
+
+std::vector<fs::path> getDirectoryFiles(fs::path directory, const std::vector<std::string> extensions)
+{
+    auto files = std::vector<fs::path>{};
+
+    if (!fs::exists(directory) || !fs::is_directory(directory))
+    {
+        return files;
+    }
+
+    for (const auto& entry : fs::directory_iterator(directory))
+    {
+        if (fs::is_regular_file(entry.status()))
+        {
+            for (const auto& extension : extensions)
+            {
+                if (entry.path().extension() == extension)
+                {
+                    files.push_back(entry.path());
+                    continue;
+                }
+            }
+        }
+    }
+
+    return files;
+}
 
 int main(int argc, char** argv)
 {
@@ -11,9 +42,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    // Filter image files from the source directory
-    const std::vector<const char*> patterns{"*.jpg", "*.jpeg", "*.png"};
-    auto imageFiles = fs::Directory(argv[1], patterns, false);
+    const auto extensions = std::vector<std::string>{".jpg", ".png"};
+    auto imageFiles = getDirectoryFiles(argv[1], extensions);
 
     if (!imageFiles.size())
     {
@@ -23,9 +53,9 @@ int main(int argc, char** argv)
 
     Atlas a;
 
-    for (auto file : imageFiles)
+    for (const auto& file : imageFiles)
     {
-        std::cout << "Adding image: " << file.relative_path() << std::endl;
+        std::cout << "Adding image: " << file.relative_path().string() << std::endl;
         if (!a.addImage(file.relative_path()))
         {
             std::cerr << "Failed to add image: " << file.relative_path() << std::endl;
@@ -39,7 +69,7 @@ int main(int argc, char** argv)
         return -4;
     }
 
-    if (!a.createAtlas("atlas.jpg", "atlas.txt"))
+    if (!a.createAtlas("atlas.png", "atlas.txt"))
     {
         std::cerr << "Failed to create atlas image and metadata" << std::endl;
         return -5;

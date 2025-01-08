@@ -1,27 +1,60 @@
 #pragma once
 
+#include <filesystem>
+
+#include "image.hpp"
 #include "vendor/rectpack2d/src/pack.h"
 
 /**
-*  @brief Class that holds all the data for an image to be packed into atlas.
-*/
-struct ImageRect
+ *  @brief Class that holds all the data for an image to be packed into atlas.
+ */
+class ImageRect
 {
-    std::string mFilename;
-    zz::Image mImage;
-    rect_xywhf mRect;
-
-    ImageRect(std::string filename)
-        : mFilename(filename),
-          mImage(filename.c_str()),
-          mRect(0, 0, mImage.cols(), mImage.rows())
+public:
+    explicit ImageRect(const std::filesystem::path& filepath)
+        : mImage(filepath, false),
+          mFilepath(filepath),
+          mRect(0, 0, static_cast<int>(mImage.width()), static_cast<int>(mImage.height()))
     {
     }
 
-    int getX() const { return mRect.x; }
-    int getY() const { return mRect.y; }
-    int getWidth() const { return mRect.w; }
-    int getHeight() const { return mRect.h; }
+    size_t x() const
+    {
+        return static_cast<size_t>(mRect.x);
+    }
 
-    std::string filename() const { return mFilename; }
+    size_t y() const
+    {
+        return static_cast<size_t>(mRect.y);
+    }
+
+    size_t width() const
+    {
+        return static_cast<size_t>(mRect.w);
+    }
+
+    size_t height() const
+    {
+        return static_cast<size_t>(mRect.h);
+    }
+
+    const Image& image() const
+    {
+        return mImage;
+    }
+
+    const rect_xywhf& rect() const
+    {
+        return mRect;
+    }
+
+    std::filesystem::path filepath() const
+    {
+        return mFilepath;
+    }
+
+private:
+    Image mImage{0, 0, 0};
+    std::filesystem::path mFilepath{};
+    rect_xywhf mRect;
 };

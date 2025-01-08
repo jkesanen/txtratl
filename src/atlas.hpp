@@ -1,13 +1,13 @@
 #pragma once
 
-#include "vendor/rectpack2d/src/pack.h"
-#include "vendor/zupply/zupply.hpp"
+#include <filesystem>
 
+#include "image.hpp"
 #include "imagerect.hpp"
 
 class Atlas
 {
-    static constexpr int ATLAS_MAX_SIDE = 4096; ///< Maximum side for atlas image in pixels
+    static constexpr size_t ATLAS_MAX_SIDE = 24000; ///< Maximum side for atlas image in pixels
 
 public:
     /**
@@ -16,7 +16,7 @@ public:
     *   @param  filename is a JPEG or PNG file to be added to the atlas
     *   @return true, if image added successfully
     */
-    bool addImage(std::string const& filename);
+    bool addImage(const std::filesystem::path& filename);
 
     /**
     *   @brief  Packs the added images into the atlas.
@@ -32,40 +32,10 @@ public:
     *   @param  metadataFilename is the destination TXT file for atlas metadata
     *   @return true, if files were created successfully
     */
-    bool createAtlas(std::string const& imageFilename, std::string const& metadataFilename);
+    bool createAtlas(const std::filesystem::path& imageFilepath, const std::filesystem::path& metadataFilepath);
 
 private:
-    /**
-    *  @brief Class that holds the size of the target atlas.
-    */
-    struct AtlasSize
-    {
-        static constexpr int INVALID_ATLAS = -1;
-
-        AtlasSize()
-            : mWidth(INVALID_ATLAS),
-              mHeight(INVALID_ATLAS)
-        {
-        }
-
-        AtlasSize(int width, int height)
-            : mWidth(width),
-              mHeight(height)
-        {
-        }
-
-        bool isValid()
-        {
-            return (mWidth != INVALID_ATLAS);
-        }
-
-        int getWidth() const { return mWidth; }
-        int getHeight() const { return mHeight; }
-
-    private:
-        int mWidth;
-        int mHeight;
-    };
+    static constexpr size_t INVALID_ATLAS = 0;
 
     /**
     *   @brief  Blits image rect into a given canvas according to rect's coordinates.
@@ -74,7 +44,7 @@ private:
     *   @param  ir is the destination for image to be blit
     *   @return true, if file was created successfully
     */
-    void blitImage(zz::Image& canvas, ImageRect const& ir) const;
+    void blitImageRect(Image& canvas, const ImageRect& ir) const;
 
     /**
     *   @brief  Blits image rects into a given canvas according to rects coordinates.
@@ -83,7 +53,7 @@ private:
     *   @param  ir is the destination for image to be blit
     *   @return true, if file was created successfully
     */
-    bool blitImages(zz::Image& canvas) const;
+    bool blitImages(Image& canvas) const;
 
     /**
     *   @brief  Writes atlas metadata into a text file.
@@ -91,8 +61,15 @@ private:
     *   @param  outputFilename is the destination TXT file for atlas metadata
     *   @return true, if file was created successfully
     */
-    bool writeMetadata(std::string const& outputFilename) const;
+    bool writeMetadata(const std::filesystem::path& outputFilepath) const;
+
+    bool isValid() const
+    {
+        return (mWidth != INVALID_ATLAS || mHeight != INVALID_ATLAS);
+    }
 
     std::vector<ImageRect> mImages; ///< A store for image data
-    AtlasSize mAtlasSize;           ///< The dimensions of the atlas
+
+    size_t mWidth = INVALID_ATLAS;
+    size_t mHeight = INVALID_ATLAS;
 };
