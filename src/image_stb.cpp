@@ -1,3 +1,4 @@
+#include <cstring>
 #include <filesystem>
 #include <stdexcept>
 #include <string>
