@@ -12,68 +12,11 @@
 
 #include "vendor/rectpack2d/src/pack.h"
 
-void Atlas::blitImageRect(Image& canvas, const ImageRect& ir) const
-{
-    auto& source = ir.image();
-
-    // If the image data has not been loaded, do it now.
-    if (!source.data(0, 0, 0))
-    {
-        const_cast<Image&>(source).load();
-    }
-
-    if (source.channels() == canvas.channels())
-    {
-        // Source and target are in the same pixel format, copy row by row.
-        for (size_t row = 0; row < ir.height(); ++row)
-        {
-            auto src = source.data(row, 0U, 0U);
-            auto dest = canvas.data(ir.y() + row, ir.x(), 0U);
-            std::memcpy(dest, src, ir.width() * canvas.channels());
-        }
-    }
-    else if (source.channels() == 3 && canvas.channels() == 4)
-    {
-        // Convert source from RGB to RGBA format.
-        std::cout << "Fast RGBA blit " << ir.filepath() << std::endl;
-        imageblit::blitRGBtoRGBA_SSE3(canvas.data(ir.y(), ir.x(), 0),
-                                      source.data(0, 0, 0),
-                                      ir.height(),
-                                      ir.width(),
-                                      canvas.width());
-    }
-    else if (source.channels() == 4 && canvas.channels() == 3)
-    {
-#if 1
-        // Convert source from RGBA to RGB format.
-        std::cout << "Fast blit " << ir.filepath() << std::endl;
-        imageblit::blitRGBAtoRGB_SSE3(canvas.data(ir.y(), ir.x(), 0),
-                                      source.data(0, 0, 0),
-                                      ir.height(),
-                                      ir.width(),
-                                      canvas.width());
-#else
-        // Convert source from RGBA to RGB format
-        for (size_t row = 0; row < ir.getHeight(); ++row)
-        {
-            unsigned char* src = source.ptr(row, 0, 0);
-            unsigned char* dest = canvas.ptr(ir.getY() + row, ir.getX(), 0);
-
-            for (size_t col = 0; col < ir.getWidth(); ++col)
-            {
-                std::memcpy(dest, src + col * source.channels(), canvas.channels());
-                dest += canvas.channels();
-            }
-        }
-#endif
-    }
-}
-
 bool Atlas::blitImages(Image& canvas) const
 {
     for (auto& imagerect : mImages)
     {
-        blitImageRect(canvas, imagerect);
+        canvas.blitImage(imagerect.image(), imagerect.x(), imagerect.y());
     }
 
     return true;
