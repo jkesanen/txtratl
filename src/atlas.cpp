@@ -48,9 +48,9 @@ bool Atlas::writeMetadata(const std::filesystem::path& outputFilepath) const
     return true;
 }
 
-bool Atlas::addImage(const std::filesystem::path& filename)
+bool Atlas::addImage(const std::filesystem::path& filepath)
 {
-    mImages.emplace_back(ImageRect(filename.c_str()));
+    mImages.emplace_back(ImageRect(filepath));
     return true;
 }
 

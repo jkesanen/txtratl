@@ -13,10 +13,10 @@ public:
     /**
     *   @brief  Adds an image file to be packed into the atlas.
     *
-    *   @param  filename is a JPEG or PNG file to be added to the atlas
-    *   @return true, if image added successfully
+    *   @param  filepath is a JPEG or PNG file to be added to the atlas.
+    *   @return true, if the image was added successfully.
     */
-    bool addImage(const std::filesystem::path& filename);
+    bool addImage(const std::filesystem::path& filepath);
 
     /**
     *   @brief  Packs the added images into the atlas.
