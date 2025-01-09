@@ -14,6 +14,7 @@ include(vendor/stb/CMakeLists.txt)
 list(APPEND SOURCES
     atlas.cpp
     atlas.hpp
+    image.cpp
     image.hpp
     imageblit.cpp
     imageblit.hpp
