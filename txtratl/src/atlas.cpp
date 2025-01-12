@@ -6,11 +6,14 @@
 #include <ostream>
 #include <stdexcept>
 
-#include "atlas.hpp"
-#include "image.hpp"
-#include "imageblit.hpp"
+#include "txtratl/atlas.hpp"
+#include "txtratl/image.hpp"
+#include "txtratl/imageblit.hpp"
 
-#include "vendor/rectpack2d/src/pack.h"
+#include "rectpack2d/pack.h"
+
+namespace txtratl
+{
 
 bool Atlas::blitImages(Image& canvas) const
 {
@@ -48,9 +51,9 @@ bool Atlas::writeMetadata(const std::filesystem::path& outputFilepath) const
     return true;
 }
 
-bool Atlas::addImage(const std::filesystem::path& filename)
+bool Atlas::addImage(const std::filesystem::path& filepath)
 {
-    mImages.emplace_back(ImageRect(filename.c_str()));
+    mImages.emplace_back(ImageRect(filepath));
     return true;
 }
 
@@ -114,3 +117,5 @@ bool Atlas::createAtlas(const std::filesystem::path& imageFilepath, const std::f
 
     return true;
 }
+
+} // namespace txtratl

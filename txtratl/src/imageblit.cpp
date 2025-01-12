@@ -6,9 +6,9 @@
 
 #include <cstring>
 
-#include "imageblit.hpp"
+#include "txtratl/imageblit.hpp"
 
-namespace imageblit
+namespace txtratl
 {
 
 void blitRGBAtoRGB_SSE3(uint8_t* dest, const uint8_t* src, const size_t rows, const size_t cols, const size_t destCols)
@@ -80,4 +80,4 @@ void blitRGBtoRGBA_SSE3(uint8_t* dest, const uint8_t* src, const size_t rows, co
     }
 }
 
-} // namespace imageblit
+} // namespace txtratl

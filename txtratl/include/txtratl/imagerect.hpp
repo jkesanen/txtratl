@@ -2,8 +2,11 @@
 
 #include <filesystem>
 
-#include "image.hpp"
-#include "vendor/rectpack2d/src/pack.h"
+#include "txtratl/image.hpp"
+#include "rectpack2d/pack.h"
+
+namespace txtratl
+{
 
 /**
  *  @brief Class that holds all the data for an image to be packed into atlas.
@@ -12,7 +15,7 @@ class ImageRect
 {
 public:
     explicit ImageRect(const std::filesystem::path& filepath)
-        : mImage(filepath, false),
+        : mImage(filepath, true),
           mFilepath(filepath),
           mRect(0, 0, static_cast<int>(mImage.width()), static_cast<int>(mImage.height()))
     {
@@ -54,7 +57,9 @@ public:
     }
 
 private:
-    Image mImage{0, 0, 0};
+    Image mImage;
     std::filesystem::path mFilepath{};
     rect_xywhf mRect;
 };
+
+} // namespace txtratl
