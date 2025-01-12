@@ -17,7 +17,7 @@
 namespace txtratl
 {
 
-struct Atlas::ImageRectImpl
+class Atlas::ImageRectImpl
 {
 public:
     using ImageRects = std::vector<ImageRect>;
