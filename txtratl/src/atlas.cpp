@@ -5,19 +5,52 @@
 #include <iostream>
 #include <ostream>
 #include <stdexcept>
+#include <vector>
 
 #include "txtratl/atlas.hpp"
 #include "txtratl/image.hpp"
 #include "txtratl/imageblit.hpp"
+#include "txtratl/imagerect.hpp"
 
 #include "rectpack2d/pack.h"
 
 namespace txtratl
 {
 
+struct Atlas::ImageRectImpl
+{
+public:
+    using ImageRects = std::vector<ImageRect>;
+
+    ImageRects& rects()
+    {
+        return mRects;
+    }
+
+private:
+    ImageRects mRects{};
+};
+
+Atlas::Atlas() : mImpl(std::make_unique<ImageRectImpl>())
+{
+}
+
+Atlas::~Atlas() = default;
+
+Atlas::Atlas(const Atlas& other)
+    : mImpl(std::make_unique<ImageRectImpl>(*other.mImpl))
+{
+}
+
+Atlas& Atlas::operator=(Atlas rhs)
+{
+    swap(mImpl, rhs.mImpl);
+    return *this;
+}
+
 bool Atlas::blitImages(Image& canvas) const
 {
-    for (auto& imagerect : mImages)
+    for (auto& imagerect : mImpl->rects())
     {
         canvas.blitImage(imagerect.image(), imagerect.x(), imagerect.y());
     }
@@ -36,7 +69,7 @@ bool Atlas::writeMetadata(const std::filesystem::path& outputFilepath) const
         return false;
     }
 
-    for (auto const& image : mImages)
+    for (auto const& image : mImpl->rects())
     {
         // Create a tab separated row consisting of:
         //   filename, x coordinate, y coordinate, width, height
@@ -53,7 +86,7 @@ bool Atlas::writeMetadata(const std::filesystem::path& outputFilepath) const
 
 bool Atlas::addImage(const std::filesystem::path& filepath)
 {
-    mImages.emplace_back(ImageRect(filepath));
+    mImpl->rects().emplace_back(ImageRect(filepath));
     return true;
 }
 
@@ -62,7 +95,7 @@ bool Atlas::packImages()
     auto rects = std::vector<rect_xywhf*>{};
 
     // Push rect pointers into a vector for passing to rectpack2D
-    for (const auto& image : mImages)
+    for (const auto& image : mImpl->rects())
     {
         rects.push_back(const_cast<rect_xywhf*>(&image.rect()));
     }

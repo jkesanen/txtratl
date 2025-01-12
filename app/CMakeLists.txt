@@ -22,7 +22,7 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE txtratl rectpack2d)
+target_link_libraries(${PROJECT_NAME} PRIVATE txtratl)
 
 set(OUTPUT_NAME txtratl)
 

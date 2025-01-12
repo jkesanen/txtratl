@@ -1,18 +1,26 @@
 #pragma once
 
 #include <filesystem>
-
-#include "txtratl/image.hpp"
-#include "txtratl/imagerect.hpp"
+#include <memory>
 
 namespace txtratl
 {
+
+// Forward declarations.
+class Image;
 
 class Atlas
 {
     static constexpr size_t ATLAS_MAX_SIDE = 24000; ///< Maximum side for atlas image in pixels
 
 public:
+    explicit Atlas();
+
+    ~Atlas();
+
+    Atlas(const Atlas& other);
+    Atlas& operator=(Atlas rhs);
+
     /**
      *   @brief  Adds an image file to be packed into the atlas.
      *
@@ -62,7 +70,9 @@ private:
         return (mWidth != INVALID_ATLAS || mHeight != INVALID_ATLAS);
     }
 
-    std::vector<ImageRect> mImages; ///< A store for image data
+    class ImageRectImpl;
+
+    std::unique_ptr<ImageRectImpl> mImpl;
 
     size_t mWidth = INVALID_ATLAS;
     size_t mHeight = INVALID_ATLAS;
