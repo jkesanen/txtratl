@@ -2,13 +2,29 @@
 #include <filesystem>
 #include <stdexcept>
 
+#include "txtratl/image.hpp"
+
+// Including stb_image and stb_image_write generates a plenty of compiler warnings.
+// Ignore those warnings when including these headers to allow project to have high level of warnings enabled. 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4365 4820 4996 5045 5219 5262)
+#else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
 
-#include "txtratl/image.hpp"
+#ifdef _MSC_VER
+#pragma warning(pop)
+#else
+#pragma GCC diagnostic pop
+#endif
 
 namespace txtratl
 {
