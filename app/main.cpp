@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "atlas.hpp"
+#include "txtratl/atlas.hpp"
 
 namespace fs = std::filesystem;
 

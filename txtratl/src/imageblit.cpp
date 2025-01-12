@@ -6,7 +6,7 @@
 
 #include <cstring>
 
-#include "imageblit.hpp"
+#include "txtratl/imageblit.hpp"
 
 namespace imageblit
 {

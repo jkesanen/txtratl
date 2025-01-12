@@ -6,11 +6,11 @@
 #include <ostream>
 #include <stdexcept>
 
-#include "atlas.hpp"
-#include "image.hpp"
-#include "imageblit.hpp"
+#include "txtratl/atlas.hpp"
+#include "txtratl/image.hpp"
+#include "txtratl/imageblit.hpp"
 
-#include "vendor/rectpack2d/src/pack.h"
+#include "rectpack2d/pack.h"
 
 bool Atlas::blitImages(Image& canvas) const
 {

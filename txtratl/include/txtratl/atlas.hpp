@@ -2,8 +2,8 @@
 
 #include <filesystem>
 
-#include "image.hpp"
-#include "imagerect.hpp"
+#include "txtratl/image.hpp"
+#include "txtratl/imagerect.hpp"
 
 class Atlas
 {
@@ -36,15 +36,6 @@ public:
 
 private:
     static constexpr size_t INVALID_ATLAS = 0;
-
-    /**
-    *   @brief  Blits image rect into a given canvas according to rect's coordinates.
-    *
-    *   @param  canvas is the destination for image to be blit
-    *   @param  ir is the destination for image to be blit
-    *   @return true, if file was created successfully
-    */
-    void blitImageRect(Image& canvas, const ImageRect& ir) const;
 
     /**
     *   @brief  Blits image rects into a given canvas according to rects coordinates.

@@ -2,9 +2,13 @@
 #include <filesystem>
 #include <stdexcept>
 
-#include "image.hpp"
-#include "vendor/stb/stb_image.h"
-#include "vendor/stb/stb_image_write.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"
+
+#include "txtratl/image.hpp"
 
 void Image::loadinfo(const std::filesystem::path& filepath)
 {
@@ -14,7 +18,7 @@ void Image::loadinfo(const std::filesystem::path& filepath)
 
     auto result = stbi_info(filepath.string().c_str(), &width, &height, &channels);
 
-    if (result)
+    if (result != 1)
     {
         std::string msg = "Failed to get the information from file '" + filepath.string() + "': ";
         msg += stbi_failure_reason();

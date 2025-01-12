@@ -1,7 +1,7 @@
 #include <cstring>
 
-#include "image.hpp"
-#include "imageblit.hpp"
+#include "txtratl/image.hpp"
+#include "txtratl/imageblit.hpp"
 
 Image::Image(const std::filesystem::path& filepath, bool deferLoading)
 {
