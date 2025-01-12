@@ -1,70 +1,56 @@
 # txtratl
 
-A simple texture atlas creation tool written in C++11
+A simple texture atlas creation library and tool.
 
-The tool's source is self-containing in sense that the dependencies are bundled
-in into `vendor` directory.
+The source is self-containing and the dependencies are bundled into `libs` directory.
+
+This is not a serious best tool ever to generate texture atlases. This was originally a homework that was completed in a few hours. And later on updated to be a simple example project / memory pad for CMake configuration.
 
 ## Requirements
 
-This software is build using CMake. Download Windows CMake from [CMake homepage](https://cmake.org/download/)
-
-On Ubuntu GNU/Linux CMake can be installed with apt:
-
-    sudo apt install cmake
+This software is build using CMake.
 
 ## Compiling
 
 ### Windows
 
-Tested to compile on Visual Studio 2015 Express.
+Tested to compile on Visual Studio Community 2022.
 
-* Create a build directory:
+* Create project files from sources for Visual Studio:
 
-    `mkdir build`
-    `cd build`
+    `cmake -G "Visual Studio 17 2022" -B ..\build`
 
-* Create a project file from sources for Visual Studio:
-
-    `cmake -G "Visual Studio 14 Win64" ..\txtratl\src`
-
-* Compile from command line:
+* Compile in the build directory:
 
     `MSBuild txtratl.sln`
 
 ### Linux
 
-Tested to compile in Ubuntu GNU/Linux 18.04 with GCC 7.3.0.
-
-* Create a build directory:
-
-    `mkdir build && cd build`
+Tested to compile in Ubuntu GNU/Linux 22.04 with GCC 11.4.0.
 
 * Create a Makefile from sources:
 
-    `cmake ../txtratl/src`
+    `cmake -B ../build`
 
-* Compile:
+* Compile in the build directory:
 
-    `make`
+    `make -j`
 
 ## Usage
 
-Pass a path containing texture images in PNG and JPEG format to the executable.
+Pass a path containing texture images in PNG and JPEG formats to the executable.
 
     txtratl ../images
 
-Files `atlas.jpg` and `atlas.txt` are created into the working directory.
+Files `atlas.png` and `atlas.txt` are created into the working directory.
 
 ## Limitations
 
-There are many.
-
-* Maximum side length for the atlas is fixed 4096 pixels
-* Only JPEG output is supported (lossy, no alpha channel) due to zupply's PNG writing issues
-* If images don't fit into 4096 x 4096 sized atlas, then nothing is generated
-* If you feed too many images to the program, it will run out of memory
-* Blitting 32-bit images requires SSE3 support
+* Maximum side length for the atlas is fixed 4096 pixels.
+* Only PNG output is supported.
+* If images don't fit into 24000 x 24000 sized atlas, then nothing is generated.
+* If you feed too many images to the program, it will run out of memory.
+* Blitting 32-bit images requires SSE3 support.
 
 ## Sample output
 
