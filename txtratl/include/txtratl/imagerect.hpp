@@ -5,6 +5,9 @@
 #include "txtratl/image.hpp"
 #include "rectpack2d/pack.h"
 
+namespace txtratl
+{
+
 /**
  *  @brief Class that holds all the data for an image to be packed into atlas.
  */
@@ -58,3 +61,5 @@ private:
     std::filesystem::path mFilepath{};
     rect_xywhf mRect;
 };
+
+} // namespace txtratl

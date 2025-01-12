@@ -10,6 +10,9 @@
 
 #include "txtratl/image.hpp"
 
+namespace txtratl
+{
+
 void Image::loadinfo(const std::filesystem::path& filepath)
 {
     auto width = 0;
@@ -57,3 +60,5 @@ void Image::save(const std::filesystem::path& filepath) const
 {
     stbi_write_png(filepath.string().c_str(), mWidth, mHeight, mChannels, (*mData).data(), mWidth * mChannels);
 }
+
+} // namespace txtratl

@@ -51,7 +51,7 @@ int main(int argc, char** argv)
         return -2;
     }
 
-    Atlas a;
+    txtratl::Atlas a;
 
     for (const auto& file : imageFiles)
     {

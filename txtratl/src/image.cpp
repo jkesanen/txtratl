@@ -3,6 +3,9 @@
 #include "txtratl/image.hpp"
 #include "txtratl/imageblit.hpp"
 
+namespace txtratl
+{
+
 Image::Image(const std::filesystem::path& filepath, bool deferLoading)
 {
     if (deferLoading)
@@ -88,21 +91,21 @@ void Image::blitImage(const Image& source, size_t x, size_t y)
     else if (source.channels() == 3 && channels() == 4)
     {
         // Convert source from RGB to RGBA format.
-        imageblit::blitRGBtoRGBA_SSE3(data(x, y, 0),
-                                      source.data(0, 0, 0),
-                                      source.height(),
-                                      source.width(),
-                                      width());
+        blitRGBtoRGBA_SSE3(data(x, y, 0),
+                           source.data(0, 0, 0),
+                           source.height(),
+                           source.width(),
+                           width());
     }
     else if (source.channels() == 4 && channels() == 3)
     {
 #if 1
         // Convert source from RGBA to RGB format.
-        imageblit::blitRGBAtoRGB_SSE3(data(x, y, 0),
-                                      source.data(0, 0, 0),
-                                      source.height(),
-                                      source.width(),
-                                      width());
+        blitRGBAtoRGB_SSE3(data(x, y, 0),
+                           source.data(0, 0, 0),
+                           source.height(),
+                           source.width(),
+                           width());
 #else
         // Convert source from RGBA to RGB format
         for (size_t row = 0; row < source.height(); ++row)
@@ -119,3 +122,5 @@ void Image::blitImage(const Image& source, size_t x, size_t y)
 #endif
     }
 }
+
+} // namespace txtratl

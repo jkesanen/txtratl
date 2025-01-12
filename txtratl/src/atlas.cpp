@@ -12,6 +12,9 @@
 
 #include "rectpack2d/pack.h"
 
+namespace txtratl
+{
+
 bool Atlas::blitImages(Image& canvas) const
 {
     for (auto& imagerect : mImages)
@@ -114,3 +117,5 @@ bool Atlas::createAtlas(const std::filesystem::path& imageFilepath, const std::f
 
     return true;
 }
+
+} // namespace txtratl

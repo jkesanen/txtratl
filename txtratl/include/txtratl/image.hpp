@@ -4,6 +4,9 @@
 #include <memory>
 #include <vector>
 
+namespace txtratl
+{
+
 class Image
 {
 public:
@@ -36,3 +39,5 @@ private:
     size_t mHeight = 0;
     size_t mChannels = 0;
 };
+
+} // namespace txtratl
