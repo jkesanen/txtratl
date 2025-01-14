@@ -51,6 +51,15 @@ public:
      */
     void save(const std::filesystem::path& filename) const;
 
+    /**
+     * Gets a pointer to the specified pixel of the image's data.
+     *
+     * @param x The x coordinate of the image.
+     * @param y The y coordinate of the image.
+     * @param channels The channel of the image (R, G, B(, A)).
+     *
+     * @throws std::out_of_range if accessed outside of image's date (no validation for x, y, channel parameters).
+     */
     std::byte* data(size_t x, size_t y, size_t channel) const;
 
     size_t channels() const;

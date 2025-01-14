@@ -43,7 +43,13 @@ std::byte* Image::data(size_t x, size_t y, size_t channel) const
         return nullptr;
     }
 
-    size_t offset = y * mWidth * mChannels + x * mChannels + channel;
+    const size_t offset = y * mWidth * mChannels + x * mChannels + channel;
+
+    if (offset >= (*mData).size())
+    {
+        throw std::out_of_range("Out of bounds access to image data.");
+    }
+
     return (*mData).data() + offset;
 }
 
