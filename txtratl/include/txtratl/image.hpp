@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <filesystem>
 #include <memory>
 #include <vector>
@@ -50,7 +51,7 @@ public:
      */
     void save(const std::filesystem::path& filename) const;
 
-    uint8_t* data(size_t x, size_t y, size_t channel) const;
+    std::byte* data(size_t x, size_t y, size_t channel) const;
 
     size_t channels() const;
     size_t height() const;
@@ -79,7 +80,7 @@ private:
 
     void allocate(size_t width, size_t height, size_t channels);
 
-    std::shared_ptr<std::vector<uint8_t>> mData = nullptr;
+    std::shared_ptr<std::vector<std::byte>> mData = nullptr;
     std::filesystem::path mFilePath{};
 
     size_t mWidth = 0;

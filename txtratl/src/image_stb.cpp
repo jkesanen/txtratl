@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstring>
 #include <filesystem>
 #include <stdexcept>
@@ -56,7 +57,7 @@ void Image::load(const std::filesystem::path& filepath)
     auto height = 0;
     auto channels = 0;
 
-    uint8_t* buffer = stbi_load(filepath.string().c_str(), &width, &height, &channels, 0);
+    auto buffer = stbi_load(filepath.string().c_str(), &width, &height, &channels, 0);
 
     if (!buffer)
     {

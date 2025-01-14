@@ -15,7 +15,7 @@ namespace txtratl
  * @param width The width of the source image.
  * @param destCols The width of the destination image.
  */
-void blitRGBAtoRGB_SSE3(uint8_t* dest, const uint8_t* src, const size_t width, const size_t height, const size_t destCols);
+void blitRGBAtoRGB_SSE3(std::byte* dest, const std::byte* src, const size_t width, const size_t height, const size_t destCols);
 
 /**
  * Blits RGB image (24-bit) into RGBA image (32-bit) utilizing SSE3 intrinsics.
@@ -26,6 +26,6 @@ void blitRGBAtoRGB_SSE3(uint8_t* dest, const uint8_t* src, const size_t width, c
  * @param width The width of the source image.
  * @param destCols Ihe width of the destination image.
  */
-void blitRGBtoRGBA_SSE3(uint8_t* dest, const uint8_t* src, const size_t width, const size_t height, const size_t destCols);
+void blitRGBtoRGBA_SSE3(std::byte* dest, const std::byte* src, const size_t width, const size_t height, const size_t destCols);
 
 }; // namespace txtratl

@@ -4,6 +4,7 @@
 #include <x86intrin.h>
 #endif
 
+#include <cstddef>
 #include <cstring>
 
 #include "txtratl/imageblit.hpp"
@@ -11,7 +12,7 @@
 namespace txtratl
 {
 
-void blitRGBAtoRGB_SSE3(uint8_t* dest, const uint8_t* src, const size_t width, const size_t height, const size_t destinationWidth)
+void blitRGBAtoRGB_SSE3(std::byte* dest, const std::byte* src, const size_t width, const size_t height, const size_t destinationWidth)
 {
     const size_t sourcePixelBytes = 4;
     const size_t destinationPixelBytes = 3;
@@ -28,10 +29,10 @@ void blitRGBAtoRGB_SSE3(uint8_t* dest, const uint8_t* src, const size_t width, c
 
     for (size_t row = 0; row < height; ++row)
     {
-        uint8_t* destRow = dest + row * destinationWidth * destinationPixelBytes;
+        std::byte* destRow = dest + row * destinationWidth * destinationPixelBytes;
 
         // Copy bytes in 16 byte (4 pixel) chunks, skip the last 4-16 bytes.
-        const uint8_t* end = src + (width - endPixels) * sourcePixelBytes;
+        const std::byte* end = src + (width - endPixels) * sourcePixelBytes;
         for (; src < end; src += 16, destRow += 12)
         {
             _mm_storeu_si128(reinterpret_cast<__m128i*>(destRow), _mm_shuffle_epi8(_mm_lddqu_si128(reinterpret_cast<const __m128i*>(src)), mask));
@@ -47,7 +48,7 @@ void blitRGBAtoRGB_SSE3(uint8_t* dest, const uint8_t* src, const size_t width, c
     }
 }
 
-void blitRGBtoRGBA_SSE3(uint8_t* dest, const uint8_t* src, const size_t width, const size_t height, const size_t destinationWidth)
+void blitRGBtoRGBA_SSE3(std::byte* dest, const std::byte* src, const size_t width, const size_t height, const size_t destinationWidth)
 {
     const size_t sourcePixelBytes = 3;
     const size_t destinationPixelBytes = 4;
@@ -65,10 +66,10 @@ void blitRGBtoRGBA_SSE3(uint8_t* dest, const uint8_t* src, const size_t width, c
 
     for (size_t row = 0; row < height; ++row)
     {
-        uint8_t* destRow = (dest + row * destinationWidth * destinationPixelBytes);
+        std::byte* destRow = (dest + row * destinationWidth * destinationPixelBytes);
 
         // Copy bytes in 12 byte (4 pixel) chunks
-        const uint8_t* end = src + (width - endPixels) * sourcePixelBytes;
+        const std::byte* end = src + (width - endPixels) * sourcePixelBytes;
         for (; src < end; src += 12, destRow += 16)
         {
             __m128i bytes = _mm_shuffle_epi8(_mm_lddqu_si128(reinterpret_cast<const __m128i*>(src)), mask);
@@ -79,10 +80,10 @@ void blitRGBtoRGBA_SSE3(uint8_t* dest, const uint8_t* src, const size_t width, c
         // Copy the remaining bytes of the row manually if there are less than 4 pixels left
         for (size_t i = 0; i < endPixels; src += sourcePixelBytes, destRow += destinationPixelBytes, ++i)
         {
-            uint32_t* d = reinterpret_cast<uint32_t*>(destRow);
-            // Little endian, but doesn't matter as this function is for SSE3 :)
-            // Set alpha to 0xff.
-            *d = static_cast<uint32_t>((0xff << 24) | (*(src + 2) << 16) | (*(src + 1) << 8) | *(src));
+            *destRow = std::byte(0xff);
+            *(destRow + 1) = src[0];
+            *(destRow + 2) = src[1];
+            *(destRow + 3) = src[0];
         }
     }
 }

@@ -28,7 +28,7 @@ void Image::allocate(size_t width, size_t height, size_t channels)
     mWidth = width;
     mHeight = height;
     mChannels = channels;
-    mData = std::make_shared<std::vector<uint8_t>>(mWidth * mHeight * mChannels);
+    mData = std::make_shared<std::vector<std::byte>>(mWidth * mHeight * mChannels);
 }
 
 void Image::load()
@@ -36,7 +36,7 @@ void Image::load()
     load(mFilePath);
 }
 
-uint8_t* Image::data(size_t x, size_t y, size_t channel) const
+std::byte* Image::data(size_t x, size_t y, size_t channel) const
 {
     if (!mData)
     {
