@@ -6,7 +6,7 @@
 #include "txtratl/image.hpp"
 
 // Including stb_image and stb_image_write generates a plenty of compiler warnings.
-// Ignore those warnings when including these headers to allow project to have high level of warnings enabled. 
+// Ignore those warnings when including these headers to allow project to have high level of warnings enabled.
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4365 4820 4996 5045 5219 5262)
@@ -75,9 +75,13 @@ void Image::load(const std::filesystem::path& filepath)
 
 void Image::save(const std::filesystem::path& filepath) const
 {
-    if (!stbi_write_png(filepath.string().c_str(), static_cast<int>(mWidth), static_cast<int>(mHeight), static_cast<int>(mChannels), (*mData).data(), static_cast<int>(mWidth * mChannels)))
+    if (stbi_write_png(filepath.string().c_str(),
+                       static_cast<int>(mWidth), static_cast<int>(mHeight), static_cast<int>(mChannels),
+                       (*mData).data(), static_cast<int>(mWidth * mChannels)) != 1)
     {
-
+        std::string msg = "Failed to save file '" + filepath.string() + "': ";
+        msg += stbi_failure_reason();
+        throw std::runtime_error(msg);
     }
 }
 
