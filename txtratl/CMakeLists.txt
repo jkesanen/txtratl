@@ -28,7 +28,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC include/)
 
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /Zc:__cplusplus /W4 /Wall)
+    target_compile_options(${PROJECT_NAME} PRIVATE /Zc:__cplusplus /W4 /Wall /wd4710 /wd4711)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     find_package(Threads REQUIRED)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -mssse3 -pthread)

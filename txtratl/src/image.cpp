@@ -28,7 +28,7 @@ void Image::allocate(size_t width, size_t height, size_t channels)
     mWidth = width;
     mHeight = height;
     mChannels = channels;
-    mData = std::make_shared<std::vector<uint8_t>>(mWidth * mHeight * mChannels);
+    mData = std::make_shared<std::vector<std::byte>>(mWidth * mHeight * mChannels);
 }
 
 void Image::load()
@@ -36,14 +36,20 @@ void Image::load()
     load(mFilePath);
 }
 
-uint8_t* Image::data(size_t x, size_t y, size_t channel) const
+std::byte* Image::data(size_t x, size_t y, size_t channel) const
 {
     if (!mData)
     {
         return nullptr;
     }
 
-    size_t offset = y * mWidth * mChannels + x * mChannels + channel;
+    const size_t offset = y * mWidth * mChannels + x * mChannels + channel;
+
+    if (offset >= (*mData).size())
+    {
+        throw std::out_of_range("Out of bounds access to image data.");
+    }
+
     return (*mData).data() + offset;
 }
 
@@ -65,12 +71,9 @@ size_t Image::width() const
 void Image::release()
 {
     mData = nullptr;
-    mChannels = 0;
-    mHeight = 0;
-    mWidth = 0;
 }
 
-void Image::blitImage(const Image& source, size_t x, size_t y)
+void Image::blitImage(const Image& source, size_t x, size_t y, bool releaseAfterUse)
 {
     // If the image data has not been loaded, do it now.
     if (!source.data(0, 0, 0))
@@ -93,8 +96,8 @@ void Image::blitImage(const Image& source, size_t x, size_t y)
         // Convert source from RGB to RGBA format.
         blitRGBtoRGBA_SSE3(data(x, y, 0),
                            source.data(0, 0, 0),
-                           source.height(),
                            source.width(),
+                           source.height(),
                            width());
     }
     else if (source.channels() == 4 && channels() == 3)
@@ -103,8 +106,8 @@ void Image::blitImage(const Image& source, size_t x, size_t y)
         // Convert source from RGBA to RGB format.
         blitRGBAtoRGB_SSE3(data(x, y, 0),
                            source.data(0, 0, 0),
-                           source.height(),
                            source.width(),
+                           source.height(),
                            width());
 #else
         // Convert source from RGBA to RGB format
@@ -120,6 +123,11 @@ void Image::blitImage(const Image& source, size_t x, size_t y)
             }
         }
 #endif
+    }
+
+    if (releaseAfterUse)
+    {
+        const_cast<Image&>(source).release();
     }
 }
 

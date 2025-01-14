@@ -1,10 +1,5 @@
-#include <algorithm>
-#include <cstdio>
-#include <cstring>
 #include <fstream>
 #include <iostream>
-#include <ostream>
-#include <stdexcept>
 #include <vector>
 
 #include "txtratl/atlas.hpp"
@@ -17,7 +12,7 @@
 namespace txtratl
 {
 
-class Atlas::ImageRectImpl
+class Atlas::ImageRectImpl final
 {
 public:
     using ImageRects = std::vector<ImageRect>;
@@ -48,14 +43,12 @@ Atlas& Atlas::operator=(Atlas rhs)
     return *this;
 }
 
-bool Atlas::blitImages(Image& canvas) const
+void Atlas::blitImages(Image& canvas) const
 {
     for (auto& imagerect : mImpl->rects())
     {
-        canvas.blitImage(imagerect.image(), imagerect.x(), imagerect.y());
+        canvas.blitImage(imagerect.image(), imagerect.x(), imagerect.y(), true);
     }
-
-    return true;
 }
 
 bool Atlas::writeMetadata(const std::filesystem::path& outputFilepath) const
@@ -84,10 +77,9 @@ bool Atlas::writeMetadata(const std::filesystem::path& outputFilepath) const
     return true;
 }
 
-bool Atlas::addImage(const std::filesystem::path& filepath)
+void Atlas::addImage(const std::filesystem::path& filepath)
 {
     mImpl->rects().emplace_back(ImageRect(filepath));
-    return true;
 }
 
 bool Atlas::packImages()
@@ -116,7 +108,7 @@ bool Atlas::packImages()
         return false;
     }
 
-    // Update the size of the target atlas
+    // Update the size of the target atlas.
     mWidth = static_cast<size_t>(bins[0].size.w);
     mHeight = static_cast<size_t>(bins[0].size.h);
 
@@ -125,16 +117,13 @@ bool Atlas::packImages()
 
 bool Atlas::createAtlas(const std::filesystem::path& imageFilepath, const std::filesystem::path& metadataFilepath)
 {
-    // Create an empty image for atlas
+    // Create an empty image for atlas.
     auto canvas = Image(mHeight, mWidth, 4);
 
-    // Blit images into atlas image according to rect coordinates decided by packing
-    if (!blitImages(canvas))
-    {
-        return false;
-    }
+    // Blits the images into an atlas image according to rect coordinates decided by packing.
+    blitImages(canvas);
 
-    // Write the atlas image into the destionation file
+    // Write the atlas image file and release the data from memory.
     canvas.save(imageFilepath);
     canvas.release();
 

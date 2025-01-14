@@ -11,37 +11,45 @@ class Image;
 
 class Atlas
 {
-    static constexpr size_t ATLAS_MAX_SIDE = 24000; ///< Maximum side for atlas image in pixels
+    /// Maximum side length in pixels for the atlas image.
+    static constexpr size_t ATLAS_MAX_SIDE = 24000;
 
 public:
+    /// Constructor.
     explicit Atlas();
 
+    /// Default destructor.
     ~Atlas();
 
+    /// Copy constructor.
     Atlas(const Atlas& other);
+
+    /// Assignment operator.
     Atlas& operator=(Atlas rhs);
 
     /**
-     *   @brief  Adds an image file to be packed into the atlas.
+     * Adds an image file to be packed into the atlas.
      *
-     *   @param  filepath is a JPEG or PNG file to be added to the atlas.
-     *   @return true, if the image was added successfully.
+     * @param filepath is a JPEG or PNG file to be added to the atlas.
+     *
+     * @return true, if the image was added successfully.
      */
-    bool addImage(const std::filesystem::path& filepath);
+    void addImage(const std::filesystem::path& filepath);
 
     /**
-     *   @brief  Packs the added images into the atlas.
+     * Packs the images into the atlas.
      *
-     *   @return true, if packing was successfull
+     * @return true, if packing was successful.
      */
     bool packImages();
 
     /**
-     *   @brief  Creates an atlas image and a metadata file with image locations in atlas.
+     * Creates an atlas image and a metadata file with the image locations in atlas.
      *
-     *   @param  imageFilename is the destination JPEG file for the atlas
-     *   @param  metadataFilename is the destination TXT file for atlas metadata
-     *   @return true, if files were created successfully
+     * @param imageFilename is the destination image file for the atlas.
+     * @param metadataFilename is the destination text file for atlas metadata.
+     *
+     * @return true, if files were created successfully.
      */
     bool createAtlas(const std::filesystem::path& imageFilepath, const std::filesystem::path& metadataFilepath);
 
@@ -49,26 +57,21 @@ private:
     static constexpr size_t INVALID_ATLAS = 0;
 
     /**
-     *   @brief  Blits image rects into a given canvas according to rects coordinates.
+     * Blits image rects into a canvas according to rect coordinates.
      *
-     *   @param  canvas is the destination for image to be blit
-     *   @param  ir is the destination for image to be blit
-     *   @return true, if file was created successfully
+     * @param canvas is the destination for image to be blit.
+     * @param ir is the destination for image to be blit.
      */
-    bool blitImages(Image& canvas) const;
+    void blitImages(Image& canvas) const;
 
     /**
-     *   @brief  Writes atlas metadata into a text file.
+     * Writes atlas metadata into a text file.
      *
-     *   @param  outputFilename is the destination TXT file for atlas metadata
-     *   @return true, if file was created successfully
+     * @param outputFilename is the destination TXT file for atlas metadata.
+     *
+     * @return true, if the file was created successfully.
      */
     bool writeMetadata(const std::filesystem::path& outputFilepath) const;
-
-    bool isValid() const
-    {
-        return (mWidth != INVALID_ATLAS || mHeight != INVALID_ATLAS);
-    }
 
     class ImageRectImpl;
 
