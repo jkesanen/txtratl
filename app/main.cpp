@@ -78,10 +78,6 @@ int main(int argc, char** argv)
         std::cerr << "Exception: " << e.what() << std::endl;
         return -1;
     }
-    catch (...)
-    {
-        std::cerr << std::endl;
-    }
 
     return 0;
 }
