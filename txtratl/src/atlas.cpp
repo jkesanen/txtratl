@@ -1,10 +1,5 @@
-#include <algorithm>
-#include <cstdio>
-#include <cstring>
 #include <fstream>
 #include <iostream>
-#include <ostream>
-#include <stdexcept>
 #include <vector>
 
 #include "txtratl/atlas.hpp"
