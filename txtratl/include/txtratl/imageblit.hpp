@@ -11,8 +11,8 @@ namespace txtratl
  *
  * @param dest A pointer to destination image.
  * @param src A pointer to source image.
- * @param height The height of the source image.
  * @param width The width of the source image.
+ * @param height The height of the source image.
  * @param destCols The width of the destination image.
  */
 void blitRGBAtoRGB_SSE3(std::byte* dest, const std::byte* src, const size_t width, const size_t height, const size_t destCols);
@@ -22,8 +22,8 @@ void blitRGBAtoRGB_SSE3(std::byte* dest, const std::byte* src, const size_t widt
  *
  * @param dest A pointer to destination image.
  * @param src A pointer to source image.
- * @param height The height of the source image.
  * @param width The width of the source image.
+ * @param height The height of the source image.
  * @param destCols Ihe width of the destination image.
  */
 void blitRGBtoRGBA_SSE3(std::byte* dest, const std::byte* src, const size_t width, const size_t height, const size_t destCols);
