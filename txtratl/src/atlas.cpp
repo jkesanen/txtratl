@@ -52,7 +52,7 @@ void Atlas::blitImages(Image& canvas) const
 {
     for (auto& imagerect : mImpl->rects())
     {
-        canvas.blitImage(imagerect.image(), imagerect.x(), imagerect.y());
+        canvas.blitImage(imagerect.image(), imagerect.x(), imagerect.y(), true);
     }
 }
 

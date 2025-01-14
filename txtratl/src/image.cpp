@@ -65,12 +65,9 @@ size_t Image::width() const
 void Image::release()
 {
     mData = nullptr;
-    mChannels = 0;
-    mHeight = 0;
-    mWidth = 0;
 }
 
-void Image::blitImage(const Image& source, size_t x, size_t y)
+void Image::blitImage(const Image& source, size_t x, size_t y, bool releaseAfterUse)
 {
     // If the image data has not been loaded, do it now.
     if (!source.data(0, 0, 0))
@@ -120,6 +117,11 @@ void Image::blitImage(const Image& source, size_t x, size_t y)
             }
         }
 #endif
+    }
+
+    if (releaseAfterUse)
+    {
+        const_cast<Image&>(source).release();
     }
 }
 

@@ -74,7 +74,10 @@ void Image::load(const std::filesystem::path& filepath)
 
 void Image::save(const std::filesystem::path& filepath) const
 {
-    stbi_write_png(filepath.string().c_str(), static_cast<int>(mWidth), static_cast<int>(mHeight), static_cast<int>(mChannels), (*mData).data(), static_cast<int>(mWidth * mChannels));
+    if (!stbi_write_png(filepath.string().c_str(), static_cast<int>(mWidth), static_cast<int>(mHeight), static_cast<int>(mChannels), (*mData).data(), static_cast<int>(mWidth * mChannels)))
+    {
+
+    }
 }
 
 } // namespace txtratl

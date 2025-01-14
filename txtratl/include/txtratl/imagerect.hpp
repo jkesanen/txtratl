@@ -8,9 +8,7 @@
 namespace txtratl
 {
 
-/**
- *  @brief Class that holds all the data for an image to be packed into atlas.
- */
+ /// Holds all the data for an image to be packed into atlas.
 class ImageRect
 {
 public:
