@@ -3,12 +3,13 @@
 #include <filesystem>
 
 #include "txtratl/image.hpp"
+
 #include "rectpack2d/pack.h"
 
 namespace txtratl
 {
 
- /// Holds all the data for an image to be packed into atlas.
+/// Holds all the data for an image to be packed into atlas.
 class ImageRect
 {
 public:
