@@ -93,8 +93,8 @@ void Image::blitImage(const Image& source, size_t x, size_t y)
         // Convert source from RGB to RGBA format.
         blitRGBtoRGBA_SSE3(data(x, y, 0),
                            source.data(0, 0, 0),
-                           source.height(),
                            source.width(),
+                           source.height(),
                            width());
     }
     else if (source.channels() == 4 && channels() == 3)
@@ -103,8 +103,8 @@ void Image::blitImage(const Image& source, size_t x, size_t y)
         // Convert source from RGBA to RGB format.
         blitRGBAtoRGB_SSE3(data(x, y, 0),
                            source.data(0, 0, 0),
-                           source.height(),
                            source.width(),
+                           source.height(),
                            width());
 #else
         // Convert source from RGBA to RGB format
